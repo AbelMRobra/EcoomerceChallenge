@@ -1,2 +1,2 @@
-# EcoomerceChallenge
+# EcomerceChallenge
 Challenge de ClichOH
