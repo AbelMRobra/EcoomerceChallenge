@@ -1,9 +1,23 @@
 from ecommerce.models import Product, Order
 from .serializers import *
+from django.contrib.auth.models import User
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
+class UserViewset(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerialiazers
+
+    def list(self, request, *args, **kwargs):
+
+        response = {'massege': 'Not available'}
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+    def retrieve(self, request, *args, **kwargs):
+
+        response = {'massege': 'Not available'}
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 class ProductViewset(viewsets.ModelViewSet):
 
@@ -36,7 +50,15 @@ class OrderDetailViewset(viewsets.ModelViewSet):
         instance = self.get_object()
         product = Product.objects.get(id = instance.product.id)
 
-        if int(request.data.dict()['cuantity']) > (instance.cuantity + product.stock):
+        try:
+            cantidad_verificar = int(request.data.dict()['cuantity'])
+
+        except:
+
+            response = {'massege': 'Cuantity must be a number'}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        if cantidad_verificar > (instance.cuantity + product.stock):
 
             response = {'massege': f'Insufficient stock for {product.name}'}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
@@ -92,17 +114,34 @@ class OrderViewset(viewsets.ModelViewSet):
                 product_to_update = []
 
                 for key_name in request.data.dict().keys():
-
+                    
                     if 'product' in key_name:
+
+                        ## -> Verificación de valor
 
                         if len(key_name.split("_")) > 1:
 
                             producto_verificar = request.data.dict()[f'product_{key_name.split("_")[1]}']
-                            cantidad_verificar = int(request.data.dict()[f'cuantity_{key_name.split("_")[1]}'])
+                            
+                            try:
+                                cantidad_verificar = int(request.data.dict()[f'cuantity_{key_name.split("_")[1]}'])
+
+                            except:
+
+                                response = {'massege': 'Cuantity must be a number'}
+                                return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
                         else:
+
                             producto_verificar = request.data.dict()['product']
-                            cantidad_verificar = int(request.data.dict()['cuantity'])
+
+                            try:
+                                cantidad_verificar = int(request.data.dict()['cuantity'])
+
+                            except:
+
+                                response = {'massege': 'Cuantity must be a number'}
+                                return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
                         ## -> Verificación de exitencia
 
