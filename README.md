@@ -3,8 +3,9 @@ Challenge de ClichOH
 
 ## Instalar
 
-djangorestframework
-numpy
+* djangorestframework
+* numpy
+* requests
 
 ## Endpoints diseñados
 
