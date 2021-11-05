@@ -24,6 +24,27 @@ class ProductViewset(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializers
 
+    def update(self, request, *args, **kwargs):
+
+        if 'only_stock' in request.data:
+
+            try:
+                cantidad = int(request.data.dict()[f'only_stock'])
+
+            except:
+
+                response = {'massege': 'Cuantity must be a number'}
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+            instance = self.get_object()
+            instance.stock = cantidad
+
+            response = {'massege': 'Stock changed success!'}
+            return Response(response, status=status.HTTP_200_OK)
+
+        else:
+            viewsets.ModelViewSet.update(self, request, *args, **kwargs)
+
 class OrderDetailViewset(viewsets.ModelViewSet):
 
     queryset = OrderDetail.objects.all()
@@ -195,6 +216,6 @@ class OrderViewset(viewsets.ModelViewSet):
 
                 serializer_order_detail = OrderFullSerializers(new_order, many=False)
                 response = {'massege': 'Order created success!', 'result': serializer_order_detail.data}
-                return Response(response, status=status.HTTP_200_OK)
+                return Response(response, status=status.HTTP_201_CREATED)
 
 
